@@ -3,7 +3,7 @@
 # Note that dependencies on NDK are not directly listed since NDK auto adds
 # them.
 
-LIBYUV_INCLUDES := $(LIBYUV_PATH)/files/include
+LIBYUV_INCLUDES := $(LIBYUV_PATH)/include
 
 LIBYUV_C_FLAGS :=
 

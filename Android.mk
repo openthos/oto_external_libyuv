@@ -1,56 +1,63 @@
-# This is the Android makefile for google3/third_party/libsrtp so that we can
-# build it with the Android NDK.
-ifeq ($(TARGET_ARCH),arm)
-
-LOCAL_PATH := $(call my-dir)
-
-common_SRC_FILES := \
-    files/source/compare.cc \
-    files/source/convert.cc \
-    files/source/convert_argb.cc \
-    files/source/convert_from.cc \
-    files/source/cpu_id.cc \
-    files/source/format_conversion.cc \
-    files/source/planar_functions.cc \
-    files/source/rotate.cc \
-    files/source/rotate_argb.cc \
-    files/source/row_common.cc \
-    files/source/row_posix.cc \
-    files/source/scale.cc \
-    files/source/scale_argb.cc \
-    files/source/video_common.cc
-
-common_CFLAGS := -Wall -fexceptions
-
-ifeq ($(TARGET_ARCH_VARIANT),armv7-a-neon)
-    common_CFLAGS += -DLIBYUV_NEON
-    common_SRC_FILES += \
-        files/source/compare_neon.cc \
-        files/source/rotate_neon.cc \
-        files/source/row_neon.cc \
-        files/source/scale_neon.cc
-endif
-
-common_C_INCLUDES = $(LOCAL_PATH)/files/include
-
-# For the device
-# =====================================================
-# Device static library
+# This is the Android makefile for libyuv for both platform and NDK.
+LOCAL_PATH:= $(call my-dir)
 
 include $(CLEAR_VARS)
 
 LOCAL_CPP_EXTENSION := .cc
 
-LOCAL_SDK_VERSION := 9
-LOCAL_NDK_STL_VARIANT := stlport_static
+LOCAL_SRC_FILES := \
+    source/compare.cc           \
+    source/compare_common.cc    \
+    source/compare_neon64.cc    \
+    source/compare_gcc.cc       \
+    source/convert.cc           \
+    source/convert_argb.cc      \
+    source/convert_from.cc      \
+    source/convert_from_argb.cc \
+    source/convert_to_argb.cc   \
+    source/convert_to_i420.cc   \
+    source/cpu_id.cc            \
+    source/planar_functions.cc  \
+    source/rotate.cc            \
+    source/rotate_any.cc        \
+    source/rotate_argb.cc       \
+    source/rotate_common.cc     \
+    source/rotate_mips.cc       \
+    source/rotate_neon64.cc     \
+    source/rotate_gcc.cc        \
+    source/row_any.cc           \
+    source/row_common.cc        \
+    source/row_mips.cc          \
+    source/row_neon64.cc        \
+    source/row_gcc.cc	        \
+    source/scale.cc             \
+    source/scale_any.cc         \
+    source/scale_argb.cc        \
+    source/scale_common.cc      \
+    source/scale_mips.cc        \
+    source/scale_neon64.cc      \
+    source/scale_gcc.cc         \
+    source/video_common.cc
 
-LOCAL_SRC_FILES := $(common_SRC_FILES)
-LOCAL_CFLAGS += $(common_CFLAGS)
-LOCAL_C_INCLUDES += $(common_C_INCLUDES)
+# TODO(fbarchard): Enable mjpeg encoder.
+#   source/mjpeg_decoder.cc
+#   source/convert_jpeg.cc
+#   source/mjpeg_validate.cc
 
-LOCAL_MODULE:= libyuv_static
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+    LOCAL_CFLAGS += -DLIBYUV_NEON
+    LOCAL_SRC_FILES += \
+        source/compare_neon.cc.neon    \
+        source/rotate_neon.cc.neon     \
+        source/row_neon.cc.neon        \
+        source/scale_neon.cc.neon
+endif
+
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_C_INCLUDES += $(LOCAL_PATH)/include
+
+LOCAL_MODULE := libyuv_static
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_STATIC_LIBRARY)
 
-endif
